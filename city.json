@@ -1,0 +1,11 @@
+{
+  "name": "fort-collins",
+  "centre_lat": 40.5877,
+  "centre_lon": -105.0761,
+  "tile_size_m": 500,
+  "cell_m": 2,
+  "overview_cell_m": 20,
+  "boundary_relation": 112524,
+  "margin_m": 250,
+  "osm_extract": "https://download.geofabrik.de/north-america/us/colorado-261102.osm.pbf"
+}

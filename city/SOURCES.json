@@ -1,0 +1,112 @@
+{
+ "boundary.osm": {
+  "url": "https://api.openstreetmap.org/api/0.6/relation/112524/full",
+  "sha256": "7c646f068349090cdeffbb43ba6c0c3eefc23a5146e3b13db0e23109d1ff3108",
+  "bytes": 477538
+ },
+ "region.osm.pbf": {
+  "url": "https://download.geofabrik.de/north-america/us/colorado-261102.osm.pbf",
+  "sha256": "fafe6bea95e8b351fe20eae514bb4c48ac3da51d0991ba1e8f7d8d6c70ed0f10",
+  "bytes": 387065435
+ },
+ "dem-97-895.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=485000%2C4475000%2C490000%2C4480000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "110fecbe8564f08c7c2f2cc51bfdc738af8abdbcecfdfb30b7f1f6c9d172d709",
+  "bytes": 26218721
+ },
+ "dem-97-896.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=485000%2C4480000%2C490000%2C4485000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "7735055d750937d1ad444e38891b6d94165cd6a639882acc5f450834a7981223",
+  "bytes": 26218721
+ },
+ "dem-97-897.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=485000%2C4485000%2C490000%2C4490000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "4e028b9a1e432107a18ff244b89aed432ff7941f7c51ab19ed0bb57f027c5489",
+  "bytes": 26218721
+ },
+ "dem-97-898.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=485000%2C4490000%2C490000%2C4495000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "f88c525bd82985ac5060534f1dc4ea9b44696a2fe00469f317c2a5a009c7d5f7",
+  "bytes": 26218721
+ },
+ "dem-97-899.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=485000%2C4495000%2C490000%2C4500000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "532da9694d152ad5eddb1d311dffb5a71f0f3c89cf2518591cb60bae6ac6a0a3",
+  "bytes": 26218721
+ },
+ "dem-98-895.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=490000%2C4475000%2C495000%2C4480000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "a973ba7bcb0d3e6c39ae8bf34d05b5f74b174e183dfee5ee946e12be3ed3f026",
+  "bytes": 26218721
+ },
+ "dem-98-896.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=490000%2C4480000%2C495000%2C4485000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "af09fcb1e6c62d546ce3790f8b9edb06ee97c7a5707aca872af7bfc503a7bc29",
+  "bytes": 26218721
+ },
+ "dem-98-897.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=490000%2C4485000%2C495000%2C4490000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "04e3e82dd3a18e0f469c41e7a3686d27fd43898a0ab105312150f5d014671e8a",
+  "bytes": 26218721
+ },
+ "dem-98-898.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=490000%2C4490000%2C495000%2C4495000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "ad3fda6498d5c0a766c6e2248020af498abd92930a87eee11c338357abe12f45",
+  "bytes": 26218721
+ },
+ "dem-98-899.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=490000%2C4495000%2C495000%2C4500000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "8505df46a3246869740f1e8c25ec3395928065edce51413f22a0c052ed90ce71",
+  "bytes": 26218721
+ },
+ "dem-99-895.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=495000%2C4475000%2C500000%2C4480000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "5897bc20f11dc713a8db3707683062ffc47442b275450cbafd8d65320e34d308",
+  "bytes": 26218721
+ },
+ "dem-99-896.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=495000%2C4480000%2C500000%2C4485000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "e08ce4f00d724cb7a89690cf11d3b5adc720797d3eefc82762231bc258c8b83d",
+  "bytes": 26218721
+ },
+ "dem-99-897.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=495000%2C4485000%2C500000%2C4490000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "f95768a8effa78eb1f66118c9cd2535b6be1fc3ad2fae7c649293e9882e0290d",
+  "bytes": 26218721
+ },
+ "dem-99-898.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=495000%2C4490000%2C500000%2C4495000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "6a9726bd7f0db773d6bc556e32438fa4c199e802807c3f79d4d9e449d47f14d3",
+  "bytes": 26218721
+ },
+ "dem-99-899.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=495000%2C4495000%2C500000%2C4500000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "4da65cd6483e724f5fd44918a08716e4d15795615303b777f9f2b019c6683607",
+  "bytes": 26218721
+ },
+ "dem-100-895.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=500000%2C4475000%2C505000%2C4480000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "bd4e23b97aa44879262d8c544c874ab318a16025319e15e9c2e6ac20fc333f6e",
+  "bytes": 26218721
+ },
+ "dem-100-896.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=500000%2C4480000%2C505000%2C4485000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "ec0aac502078a5e66da4926155fd24dda0811c662eac5f9ec00b24992a21477b",
+  "bytes": 26218721
+ },
+ "dem-100-897.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=500000%2C4485000%2C505000%2C4490000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "9adcaebca87342d0fdb7d6214e0b997243730f5b1d41c59016a97a7577f7a7ad",
+  "bytes": 26218721
+ },
+ "dem-100-898.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=500000%2C4490000%2C505000%2C4495000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "dd81e9b078f4e6f0db4586ff54f0f8676b04a00884a7346a91858d35055e65b1",
+  "bytes": 26218721
+ },
+ "dem-100-899.tif": {
+  "url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=500000%2C4495000%2C505000%2C4500000&bboxSR=32613&imageSR=32613&size=2500%2C2500&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&noDataInterpretation=esriNoDataMatchAny&f=image",
+  "sha256": "26fa484965692a0e6230b6b5ea84753931c50c960d9904108e52012a40afa368",
+  "bytes": 26218721
+ }
+}
