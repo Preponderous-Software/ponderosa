@@ -12,6 +12,7 @@ namespace ponderosa {
 
 constexpr float kEyeHeight = 1.65f, kBodyRadius = 0.3f, kWalkSpeed = 1.4f, kRunSpeed = 5.0f, kTrunkRadius = 0.35f;
 constexpr float kFlySpeed = 20.0f, kFlyFastSpeed = 80.0f;
+constexpr float kJumpSpeed = 4.7f, kGravity = 9.8f;  // leaves the ground at this speed, for a hop of about 1.1 m
 constexpr float kFlyClearance = 2.0f, kFlyCeiling = 400.0f;  // metres above the ground
 
 struct SolidOutline {
@@ -92,6 +93,18 @@ private:
 // Yaw 0 faces north (-z), 90 faces east (+x).
 struct Walker {
     float x = 0, z = 0, yawDeg = 0, pitchDeg = 0, eyeY = 0;
+    float hop = 0, hopSpeed = 0;  // height of a jump above the ground, kept apart from eyeY, which eases over the terrain
+
+    // A jump starts only from the ground, so holding the key hops rather than climbs.
+    void jump() {
+        if (hop <= 0) hopSpeed = kJumpSpeed;
+    }
+    void stepHop(float dt) {
+        if (hop <= 0 && hopSpeed <= 0) return;
+        hop += hopSpeed * dt;
+        hopSpeed -= kGravity * dt;
+        if (hop <= 0) hop = hopSpeed = 0;
+    }
 
     void look(float dyaw, float dpitch) {
         yawDeg = std::fmod(yawDeg + dyaw + 360.0f, 360.0f);
