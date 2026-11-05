@@ -101,16 +101,18 @@ struct HudState {
     bool flying;
     float speed, viewRadius, height, yawDeg, fps;
     int tiles, loading;
+    float dayFraction;  // 0 midnight, 0.5 noon
 };
 
 // The status panel: what mode you are in and what your settings are, one line each.
 inline std::string hudText(const HudState& s) {
     char more[24] = "";
     if (s.loading > 0) std::snprintf(more, sizeof more, " +%d loading", s.loading);
-    char text[200];
-    std::snprintf(text, sizeof text, "%s  %.*f m/s\nheight  %.0f m\nview    %.0f m\nfacing  %s\ntiles   %d%s\n%.0f fps  H help",
+    const int minutes = static_cast<int>(s.dayFraction * 1440.0f) % 1440;
+    char text[220];
+    std::snprintf(text, sizeof text, "%s  %.*f m/s\nheight  %.0f m\nview    %.0f m\nfacing  %s\nclock   %02d:%02d\ntiles   %d%s\n%.0f fps  H help",
                   s.flying ? "flying" : "on foot", s.speed < 10 ? 1 : 0, static_cast<double>(s.speed), static_cast<double>(s.height),
-                  static_cast<double>(s.viewRadius), compass(s.yawDeg), s.tiles, more, static_cast<double>(s.fps));
+                  static_cast<double>(s.viewRadius), compass(s.yawDeg), minutes / 60, minutes % 60, s.tiles, more, static_cast<double>(s.fps));
     return text;
 }
 
