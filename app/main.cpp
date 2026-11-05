@@ -34,7 +34,7 @@ namespace {
 using Clock = std::chrono::steady_clock;
 double ms(Clock::time_point from) { return std::chrono::duration<double, std::milli>(Clock::now() - from).count(); }
 
-constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kPageUp = 75, kPageDown = 78, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
+constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, kPageUp = 75, kPageDown = 78, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
               kRight = 79, kLeft = 80, kDown = 81, kUp = 82;
 
 struct Args {
@@ -128,6 +128,11 @@ public:
         return t->second.tile.heightAt(x - offsetX(k), z - offsetZ(k));
     }
     void setOverview(const ponderosa::Overview* o) { overview_ = o; }
+    void setViewRadius(float radius) {
+        config_.loadRadius = radius;
+        config_.unloadRadius = radius + 200;
+    }
+    float viewRadius() const { return config_.loadRadius; }
     bool overTile(float x, float z) const { return std::binary_search(sorted_.begin(), sorted_.end(), keyAt(x, z)); }
     const ponderosa::Solids& solids() const { return solids_; }
     const std::vector<StrataRenderItem>& trees() const { return trees_; }
@@ -466,6 +471,8 @@ int main(int argc, char** argv) {
                 if (e.scancode >= 0 && e.scancode < 256) held[e.scancode] = true;
                 if (e.scancode == kPageUp) changeSpeed(1);
                 else if (e.scancode == kPageDown) changeSpeed(-1);
+                else if (e.scancode == kMinus) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), -1));
+                else if (e.scancode == kEquals) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), 1));
                 if (e.repeat) break;
                 if (e.scancode == kEscape) {
                     if (mouseHeld) holdMouse(false);
