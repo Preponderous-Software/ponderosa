@@ -27,7 +27,7 @@ namespace {
 using Clock = std::chrono::steady_clock;
 double ms(Clock::time_point from) { return std::chrono::duration<double, std::milli>(Clock::now() - from).count(); }
 
-constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, k9 = 38, k0 = 39, kComma = 54, kPeriod = 55, kTab = 43, kPageUp = 75, kPageDown = 78, kH = 11, kR = 21, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
+constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, k9 = 38, k0 = 39, kComma = 54, kPeriod = 55, kTab = 43, kPageUp = 75, kPageDown = 78, kH = 11, kI = 12, kR = 21, kZ = 29, kBackspace = 42, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
               kRight = 79, kLeft = 80, kDown = 81, kUp = 82;
 
 constexpr float kGlyph = 16, kLineGap = 22;  // HUD text, in pixels
@@ -419,7 +419,8 @@ int main(int argc, char** argv) {
 
     int w = a.width, h = a.height;
     bool flying = a.fly, hud = a.hud || (!a.headless && saved.panel);
-    float flySpeed = saved.flySpeed, walkSpeed = saved.walkSpeed, sensitivity = saved.sensitivity, fov = saved.fov, fps = 60;
+    float flySpeed = saved.flySpeed, walkSpeed = saved.walkSpeed, sensitivity = saved.sensitivity, fov = saved.fov, zoom = 1, fps = 60;
+    bool invertLook = saved.invertLook;
     bool helpOpen = !a.headless, helpAtStart = helpOpen, mouseHeld = false;
     std::string note;  // a passing message: what just happened, or why it did not
     float noteLeft = 0;
@@ -450,7 +451,7 @@ int main(int argc, char** argv) {
         }
         if (helpOpen) {
             const float white[4] = {1, 1, 1, 1};
-            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 16 * kLineGap + 10, {0, 0, 0, 0.5f}};
+            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 17 * kLineGap + 10, {0, 0, 0, 0.5f}};
             if (!check(strata_submit_rects(engine, &panel, 1), "help panel") ||
                 !writeLines(panel.x + 8, 14, ponderosa::kHelpText, white))
                 return false;
@@ -598,6 +599,16 @@ int main(int argc, char** argv) {
                 if (e.scancode == kEscape) {
                     if (mouseHeld) holdMouse(false);
                     else running = false;
+                } else if (e.scancode == kBackspace) {
+                    const ponderosa::Settings d;
+                    flySpeed = d.flySpeed;
+                    walkSpeed = d.walkSpeed;
+                    sensitivity = d.sensitivity;
+                    fov = d.fov;
+                    invertLook = d.invertLook;
+                    hud = d.panel;
+                    stream.setViewRadius(d.viewRadius);
+                    say("Settings back to the defaults");
                 } else if (e.scancode == kR) {
                     walker.x = startX;
                     walker.z = startZ;
@@ -667,7 +678,7 @@ int main(int argc, char** argv) {
             running = false;
         if (stream.loads() != loadsBefore) sinceLoad = 0;
     }
-    saveSettings({flySpeed, walkSpeed, stream.viewRadius(), sensitivity, fov, hud});
+    saveSettings({flySpeed, walkSpeed, stream.viewRadius(), sensitivity, fov, hud, invertLook});
     strata_destroy(engine);
     return 0;
 }

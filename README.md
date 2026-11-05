@@ -64,13 +64,14 @@ Press **H** in the window to see the controls at any time.
 | `[` and `]` | Time of day |
 | P | Save a screenshot |
 | Tab | Hide the status panel |
+| Backspace | Put every setting back to its default |
 | Esc | Free the mouse. A click takes it back, and Esc again quits. |
 
 Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles.
 A longer view costs frames, and the panel in the corner shows the frame rate as you change it.
 
 Speed, view, sensitivity, field of view and the panel are remembered between runs, in `ponderosa/settings.txt` under
-your user configuration folder. Delete that file to go back to the defaults. `ponderosa --help` lists the command-line
+your user configuration folder. `ponderosa --help` lists the command-line
 options.
 
 Headless:
