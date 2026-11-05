@@ -34,7 +34,7 @@ namespace {
 using Clock = std::chrono::steady_clock;
 double ms(Clock::time_point from) { return std::chrono::duration<double, std::milli>(Clock::now() - from).count(); }
 
-constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, kTab = 43, kPageUp = 75, kPageDown = 78, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
+constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, kTab = 43, kPageUp = 75, kPageDown = 78, kH = 11, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
               kRight = 79, kLeft = 80, kDown = 81, kUp = 82;
 
 constexpr float kGlyph = 16, kLineGap = 22;  // HUD text, in pixels
@@ -365,6 +365,14 @@ int main(int argc, char** argv) {
     int w = a.width, h = a.height;
     bool flying = a.fly, hud = a.hud || !a.headless;
     float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed, fps = 60;
+    bool helpOpen = !a.headless, helpAtStart = helpOpen, mouseHeld = false;
+    std::string note;  // a passing message: what just happened, or why it did not
+    float noteLeft = 0;
+    auto say = [&](const std::string& text) {
+        std::puts(text.c_str());
+        note = text;
+        noteLeft = 3;
+    };
     // One StrataText a line, because a '\n' inside one leaves no gap between lines.
     auto writeLines = [&](float x, float y, const std::string& text, const float color[4]) -> bool {
         std::vector<std::string> lines(1);
@@ -378,6 +386,20 @@ int main(int argc, char** argv) {
         return check(strata_submit_text(engine, labels.data(), static_cast<int32_t>(labels.size())), "text");
     };
     auto overlay = [&]() -> bool {
+        const float yellow[4] = {1, 0.9f, 0.5f, 1};
+        if (noteLeft > 0 && !writeLines((static_cast<float>(w) - static_cast<float>(note.size()) * kGlyph) / 2, static_cast<float>(h) - 48, note, yellow))
+            return false;
+        if (!a.headless && !mouseHeld) {
+            const std::string freed = "Click to look around. Esc again quits.";
+            if (!writeLines((static_cast<float>(w) - static_cast<float>(freed.size()) * kGlyph) / 2, 40, freed, yellow)) return false;
+        }
+        if (helpOpen) {
+            const float white[4] = {1, 1, 1, 1};
+            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 12 * kLineGap + 10, {0, 0, 0, 0.5f}};
+            if (!check(strata_submit_rects(engine, &panel, 1), "help panel") ||
+                !writeLines(panel.x + 8, 14, ponderosa::kHelpText, white))
+                return false;
+        }
         if (!hud) return true;
         const ponderosa::HudState state{flying, flying ? flySpeed : walkSpeed, stream.viewRadius(),
                                         walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount()};
@@ -412,13 +434,12 @@ int main(int argc, char** argv) {
     if (flying) walker.eyeY = stream.groundAt(walker.x, walker.z) + a.altitude;
     auto toggleFlight = [&] {
         if (flying && !stream.walkable(walker.x, walker.z)) {
-            std::puts("no streets here to land on");  // past the city limits, or tiles still loading
+            say("No streets here to land on");  // past the city limits, or tiles still loading
             return;
         }
         flying = !flying;
         if (flying) walker.eyeY += ponderosa::kFlyClearance;  // lift off at once
         else walker.clearOfBuildings(stream.solids(), walkableHere);
-        std::puts(flying ? "flying" : "on foot");
     };
     auto stepWalker = [&](float ahead, float right, bool run, float dt, float up = 0) {
         if (flying) {
@@ -473,8 +494,8 @@ int main(int argc, char** argv) {
         return ok ? 0 : 1;
     }
 
-    std::puts("WASD walk, Shift run, F fly (E up, Q down), mouse or arrows look, [ ] time, P screenshot, Esc frees the mouse, Esc again quits");
-    bool running = ok, mouseHeld = false;
+    std::puts("H shows the controls");
+    bool running = ok;
     auto changeSpeed = [&](int notches) {
         if (flying) flySpeed = ponderosa::stepSpeed(flySpeed, notches, ponderosa::kMinFlySpeed, ponderosa::kMaxFlySpeed);
         else walkSpeed = ponderosa::stepSpeed(walkSpeed, notches, ponderosa::kMinWalkSpeed, ponderosa::kMaxWalkSpeed);
@@ -498,9 +519,15 @@ int main(int argc, char** argv) {
                 else if (e.scancode == kMinus) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), -1));
                 else if (e.scancode == kEquals) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), 1));
                 if (e.repeat) break;
+                if (helpAtStart && (e.scancode == kW || e.scancode == kA || e.scancode == kS || e.scancode == kD || e.scancode == kF)) {
+                    helpOpen = helpAtStart = false;  // it has done its job, and H brings it back
+                }
                 if (e.scancode == kEscape) {
                     if (mouseHeld) holdMouse(false);
                     else running = false;
+                } else if (e.scancode == kH) {
+                    helpOpen = !helpOpen;
+                    helpAtStart = false;
                 } else if (e.scancode == kTab) {
                     hud = !hud;
                 } else if (e.scancode == kF) {
@@ -508,7 +535,7 @@ int main(int argc, char** argv) {
                 } else if (e.scancode == kP) {
                     char name[64];
                     std::snprintf(name, sizeof name, "ponderosa-%03d.png", shots++);
-                    if (check(strata_save_screenshot_png(engine, name), "screenshot")) std::printf("saved %s\n", name);
+                    if (check(strata_save_screenshot_png(engine, name), "screenshot")) say(std::string("Saved ") + name);
                 }
                 break;
             case STRATA_EVENT_KEY_UP:
@@ -530,6 +557,7 @@ int main(int argc, char** argv) {
         const float dt = std::min(std::chrono::duration<float>(now - last).count(), 0.1f);
         last = now;
         if (dt > 0) fps += (1.0f / dt - fps) * 0.05f;
+        noteLeft -= dt;
         walker.look(((held[kRight] ? 1.0f : 0.0f) - (held[kLeft] ? 1.0f : 0.0f)) * 90.0f * dt,
                     ((held[kUp] ? 1.0f : 0.0f) - (held[kDown] ? 1.0f : 0.0f)) * 60.0f * dt);
         stepWalker((held[kW] ? 1.0f : 0.0f) - (held[kS] ? 1.0f : 0.0f), (held[kD] ? 1.0f : 0.0f) - (held[kA] ? 1.0f : 0.0f),

@@ -23,6 +23,20 @@ inline float stepViewRadius(float radius, int steps) {
     return std::clamp(snapped * kViewRadiusStep, kMinViewRadius, kMaxViewRadius);
 }
 
+constexpr const char* kHelpText =
+    "WASD       move\n"
+    "mouse      look (arrows too)\n"
+    "Shift      go four times faster\n"
+    "wheel      slower / faster\n"
+    "- =        shorter / longer view\n"
+    "F          fly / land\n"
+    "E Q        up / down\n"
+    "[ ]        time of day\n"
+    "P          screenshot\n"
+    "Tab        hide the panel\n"
+    "H          hide this help\n"
+    "Esc        free the mouse";
+
 // Yaw 0 faces north, 90 east.
 inline const char* compass(float yawDeg) {
     static const char* const names[] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
