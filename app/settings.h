@@ -81,6 +81,10 @@ inline std::string formatSettings(const Settings& s) {
     return text;
 }
 
+// Seconds of movement a frame gets. Long enough to keep the speed honest at 4 frames a second, and short enough
+// that a stall loading tiles cannot throw the player across the map.
+inline float frameStep(float elapsed) { return std::min(elapsed, 0.25f); }
+
 inline float stepFov(float fov, int steps) {
     return std::clamp(fov + static_cast<float>(steps) * kFovStep, kMinFov, kMaxFov);
 }
