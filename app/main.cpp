@@ -15,7 +15,10 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
+#include <fstream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -45,7 +48,7 @@ struct Args {
     float altitude = 60;  // metres above the ground when --fly starts
     float time = 0.45f, yaw = 40, pitch = 0, radius = 700, walkAhead = 0, east = 0, north = 0, passEast = 0, passNorth = 0;
     int width = 1280, height = 720, bench = 0;
-    bool headless = false, run = false, hud = false;
+    bool headless = false, run = false, hud = false, radiusGiven = false;
 };
 
 bool parse(int argc, char** argv, Args& a) {
@@ -58,7 +61,10 @@ bool parse(int argc, char** argv, Args& a) {
         else if (k == "--pitch") a.pitch = static_cast<float>(std::atof(val()));
         else if (k == "--fly") a.fly = true;
         else if (k == "--altitude") a.altitude = static_cast<float>(std::atof(val()));
-        else if (k == "--radius") a.radius = static_cast<float>(std::atof(val()));
+        else if (k == "--radius") {
+            a.radius = static_cast<float>(std::atof(val()));
+            a.radiusGiven = true;
+        }
         else if (k == "--east") a.east = static_cast<float>(std::atof(val()));
         else if (k == "--north") a.north = static_cast<float>(std::atof(val()));
         else if (k == "--pass-east") a.passEast = static_cast<float>(std::atof(val()));
@@ -77,6 +83,29 @@ bool parse(int argc, char** argv, Args& a) {
         }
     }
     return a.width > 0 && a.height > 0;
+}
+
+// %APPDATA%/ponderosa, or the XDG config folder. Outside the program's own folder, so a rebuild cannot lose it.
+std::filesystem::path settingsPath() {
+    if (const char* d = std::getenv("APPDATA")) return std::filesystem::path(d) / "ponderosa" / "settings.txt";
+    if (const char* d = std::getenv("XDG_CONFIG_HOME")) return std::filesystem::path(d) / "ponderosa" / "settings.txt";
+    if (const char* d = std::getenv("HOME")) return std::filesystem::path(d) / ".config" / "ponderosa" / "settings.txt";
+    return {};
+}
+
+ponderosa::Settings loadSettings() {
+    std::ifstream in(settingsPath());
+    std::ostringstream text;
+    text << in.rdbuf();
+    return ponderosa::parseSettings(text.str());
+}
+
+void saveSettings(const ponderosa::Settings& s) {
+    const std::filesystem::path path = settingsPath();
+    if (path.empty()) return;
+    std::error_code ignored;  // settings are a convenience: failing to keep them must not stop anything
+    std::filesystem::create_directories(path.parent_path(), ignored);
+    std::ofstream(path) << ponderosa::formatSettings(s);
 }
 
 bool check(StrataStatus s, const char* what) {
@@ -289,6 +318,9 @@ private:
 int main(int argc, char** argv) {
     Args a;
     if (!parse(argc, argv, a)) return 2;
+    // A render has to come out the same for everyone, so only a window reads or writes saved settings.
+    const ponderosa::Settings saved = a.headless ? ponderosa::Settings{} : loadSettings();
+    if (!a.radiusGiven && !a.headless) a.radius = saved.viewRadius;
     ponderosa::Manifest manifest;
     std::string err;
     if (!ponderosa::loadManifest(a.tiles, manifest, &err)) {
@@ -363,8 +395,8 @@ int main(int argc, char** argv) {
     light.fog = 1;
 
     int w = a.width, h = a.height;
-    bool flying = a.fly, hud = a.hud || !a.headless;
-    float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed, sensitivity = 0.15f, fov = 70, fps = 60;
+    bool flying = a.fly, hud = a.hud || (!a.headless && saved.panel);
+    float flySpeed = saved.flySpeed, walkSpeed = saved.walkSpeed, sensitivity = saved.sensitivity, fov = saved.fov, fps = 60;
     bool helpOpen = !a.headless, helpAtStart = helpOpen, mouseHeld = false;
     std::string note;  // a passing message: what just happened, or why it did not
     float noteLeft = 0;
@@ -591,6 +623,7 @@ int main(int argc, char** argv) {
             running = false;
         if (stream.loads() != loadsBefore) sinceLoad = 0;
     }
+    saveSettings({flySpeed, walkSpeed, stream.viewRadius(), sensitivity, fov, hud});
     strata_destroy(engine);
     return 0;
 }
