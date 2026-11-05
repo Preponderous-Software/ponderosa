@@ -100,15 +100,17 @@ inline const char* compass(float yawDeg) {
 struct HudState {
     bool flying;
     float speed, viewRadius, height, yawDeg, fps;
-    int tiles;
+    int tiles, loading;
 };
 
 // The status panel: what mode you are in and what your settings are, one line each.
 inline std::string hudText(const HudState& s) {
+    char more[24] = "";
+    if (s.loading > 0) std::snprintf(more, sizeof more, " +%d loading", s.loading);
     char text[200];
-    std::snprintf(text, sizeof text, "%s  %.*f m/s\nheight  %.0f m\nview    %.0f m\nfacing  %s\ntiles   %d\n%.0f fps  H help",
+    std::snprintf(text, sizeof text, "%s  %.*f m/s\nheight  %.0f m\nview    %.0f m\nfacing  %s\ntiles   %d%s\n%.0f fps  H help",
                   s.flying ? "flying" : "on foot", s.speed < 10 ? 1 : 0, static_cast<double>(s.speed), static_cast<double>(s.height),
-                  static_cast<double>(s.viewRadius), compass(s.yawDeg), s.tiles, static_cast<double>(s.fps));
+                  static_cast<double>(s.viewRadius), compass(s.yawDeg), s.tiles, more, static_cast<double>(s.fps));
     return text;
 }
 
