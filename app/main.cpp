@@ -1,15 +1,5 @@
-// ponderosa: walk a streamed map of tiles built by `uv run ponderosa build`.
-//
-//   ponderosa [--tiles build/tiles] [--time 0.45] [--width W --height H] [--radius M]
-//         [--east M --north M] [--yaw D --pitch D]
-//         [--headless [--walk-ahead SECONDS] [--run] [--pass-east M] [--pass-north M]
-//                     [--screenshot out.png] [--bench FRAMES]]
-//
-// --pass-east and --pass-north move in a straight line through everything, to prove that tiles
-// load and unload on the way; the run fails if none unloaded.
-//
-// Controls: WASD walk, Shift run, mouse or arrows look, [ ] time of day, P screenshot,
-// Esc frees the mouse (click to take it back), Esc again quits.
+// ponderosa: walk or fly a streamed map of tiles built by `uv run ponderosa build`.
+// `ponderosa --help` lists the options, and H in the window lists the controls.
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -42,6 +32,27 @@ constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLe
 
 constexpr float kGlyph = 16, kLineGap = 22;  // HUD text, in pixels
 
+constexpr const char* kUsage =
+    "ponderosa: walk or fly a map of tiles built by `uv run ponderosa build`\n"
+    "\n"
+    "  --tiles DIR        the tiles to open (default build/tiles)\n"
+    "  --radius M         how far detailed tiles load (default 700, or your saved view)\n"
+    "  --fly              start in the air, --altitude M above the ground (default 60)\n"
+    "  --east M --north M start this far from the map's start point\n"
+    "  --yaw D --pitch D  start facing this way; yaw 0 is north, 90 is east\n"
+    "  --time T           time of day, 0 to 1 (default 0.45)\n"
+    "  --width W --height H  window size\n"
+    "  --help             this list\n"
+    "\n"
+    "Rendering without a window:\n"
+    "  --headless         render and exit; saved settings are ignored\n"
+    "  --screenshot FILE  write the frame to a PNG; --hud draws the status panel on it\n"
+    "  --walk-ahead S     walk forward first, --run to run\n"
+    "  --pass-east M --pass-north M  move in a straight line; fails if no tile unloaded\n"
+    "  --bench FRAMES     time a full turn\n"
+    "\n"
+    "Press H in the window for the controls.\n";
+
 struct Args {
     std::string tiles = std::string(PONDEROSA_SOURCE_DIR) + "/build/tiles", screenshot;
     bool fly = false;
@@ -54,7 +65,16 @@ struct Args {
 bool parse(int argc, char** argv, Args& a) {
     for (int i = 1; i < argc; ++i) {
         const std::string k = argv[i];
-        auto val = [&]() -> const char* { return i + 1 < argc ? argv[++i] : "0"; };
+        if (k == "--help" || k == "-h") {
+            std::fputs(kUsage, stdout);
+            std::exit(0);
+        }
+        const bool flag = k == "--fly" || k == "--headless" || k == "--run" || k == "--hud";
+        if (!flag && k.rfind("--", 0) == 0 && i + 1 >= argc) {
+            std::fprintf(stderr, "ponderosa: %s needs a value (--help lists the options)\n", k.c_str());
+            return false;
+        }
+        auto val = [&]() -> const char* { return argv[++i]; };
         if (k == "--tiles") a.tiles = val();
         else if (k == "--time") a.time = static_cast<float>(std::atof(val()));
         else if (k == "--yaw") a.yaw = static_cast<float>(std::atof(val()));
@@ -78,7 +98,7 @@ bool parse(int argc, char** argv, Args& a) {
         else if (k == "--hud") a.hud = true;
         else if (k == "--screenshot") a.screenshot = val();
         else {
-            std::fprintf(stderr, "unknown argument %s\n", k.c_str());
+            std::fprintf(stderr, "ponderosa: unknown option %s (--help lists the options)\n", k.c_str());
             return false;
         }
     }
