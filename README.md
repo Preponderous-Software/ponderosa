@@ -44,7 +44,7 @@ tile.
 
 WASD walks and Shift runs. The mouse or arrow keys look. **F** switches to flying: WASD follows your view at 20 m/s
 (Shift four times that), E or Space climbs, Q or Ctrl descends, and F again lands you on the ground, outside any building.
-Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles. The mouse wheel or Page Up and Page Down change your speed, from 5 to 800 m/s in the air. `-` and `=` shorten or lengthen the view, 200 to 1,500 m of detailed tiles (the default is 700 m). H shows or hides this list on screen. A panel in the corner shows your mode, speed, height and view, and Tab hides it. `[` `]` change the time of day and P saves a screenshot. Esc
+Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles. The mouse wheel or Page Up and Page Down change your speed, from 5 to 800 m/s in the air. `-` and `=` shorten or lengthen the view, 200 to 1,500 m of detailed tiles (the default is 700 m). H shows or hides this list on screen. A panel in the corner shows your mode, speed, height and view, and Tab hides it. R takes you back to where you started. `[` `]` change the time of day and P saves a screenshot. Esc
 frees the mouse, a click takes it back, and Esc again quits.
 
 Headless:
