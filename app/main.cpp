@@ -451,7 +451,7 @@ int main(int argc, char** argv) {
         }
         if (helpOpen) {
             const float white[4] = {1, 1, 1, 1};
-            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 17 * kLineGap + 10, {0, 0, 0, 0.5f}};
+            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 19 * kLineGap + 10, {0, 0, 0, 0.5f}};
             if (!check(strata_submit_rects(engine, &panel, 1), "help panel") ||
                 !writeLines(panel.x + 8, 14, ponderosa::kHelpText, white))
                 return false;
@@ -475,7 +475,7 @@ int main(int argc, char** argv) {
         const float aboveGround = walker.eyeY - stream.groundAt(walker.x, walker.z);
         ponderosa::clipPlanes(aboveGround, nearPlane, farPlane);
         light.shadow_distance = std::max(300.0f, aboveGround * 3.0f);
-        strata_camera_look_at(eye, look, up, fov, static_cast<float>(w) / static_cast<float>(std::max(1, h)), nearPlane, farPlane, &c);
+        strata_camera_look_at(eye, look, up, fov * zoom, static_cast<float>(w) / static_cast<float>(std::max(1, h)), nearPlane, farPlane, &c);
         StrataFrameDesc fd{};
         fd.clear_flags = STRATA_CLEAR_COLOR | STRATA_CLEAR_DEPTH | STRATA_CLEAR_SKY;
         const auto& trees = stream.trees();
@@ -599,6 +599,9 @@ int main(int argc, char** argv) {
                 if (e.scancode == kEscape) {
                     if (mouseHeld) holdMouse(false);
                     else running = false;
+                } else if (e.scancode == kI) {
+                    invertLook = !invertLook;
+                    say(invertLook ? "Mouse look inverted" : "Mouse look normal");
                 } else if (e.scancode == kBackspace) {
                     const ponderosa::Settings d;
                     flySpeed = d.flySpeed;
@@ -641,7 +644,7 @@ int main(int argc, char** argv) {
                 if (e.y != 0) changeSpeed(e.y > 0 ? 1 : -1);
                 break;
             case STRATA_EVENT_MOUSE_MOTION:
-                if (mouseHeld) walker.look(e.dx * sensitivity, -e.dy * sensitivity);
+                if (mouseHeld) walker.look(e.dx * sensitivity * zoom, (invertLook ? e.dy : -e.dy) * sensitivity * zoom);
                 break;
             default: break;
             }
@@ -651,6 +654,7 @@ int main(int argc, char** argv) {
         last = now;
         if (elapsed > 0) fps += (1.0f / elapsed - fps) * std::min(1.0f, elapsed * 2);  // about half a second of smoothing
         noteLeft -= dt;
+        zoom += ((held[kZ] ? 0.3f : 1.0f) - zoom) * std::min(1.0f, dt * 12);
         walker.look(((held[kRight] ? 1.0f : 0.0f) - (held[kLeft] ? 1.0f : 0.0f)) * 90.0f * dt,
                     ((held[kUp] ? 1.0f : 0.0f) - (held[kDown] ? 1.0f : 0.0f)) * 60.0f * dt);
         if (!flying && held[kSpace]) walker.jump();
