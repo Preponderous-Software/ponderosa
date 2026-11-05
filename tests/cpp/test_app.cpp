@@ -132,6 +132,22 @@ static void testWalking() {
         CHECK(std::fabs(quick.x - 300) < 1e-2f);
         quick.fly(mapped, ground, 1, 0, 0, true, 1.0f, 100.0f);
         CHECK(std::fabs(quick.x - 700) < 1e-2f);
+        CHECK(ponderosa::stepViewRadius(700, 1) == 800.0f && ponderosa::stepViewRadius(700, -1) == 600.0f);
+        CHECK(ponderosa::stepViewRadius(1500, 1) == ponderosa::kMaxViewRadius && ponderosa::stepViewRadius(200, -1) == ponderosa::kMinViewRadius);
+        CHECK(ponderosa::stepViewRadius(733, 1) == 800.0f);  // a --radius between steps lands on one
+        {
+            // The longest view fits Strata's mesh limit anywhere on a full map, with nothing dropped by the budget.
+            std::vector<ponderosa::TileKey> all;
+            for (int y = 0; y < 40; ++y)
+                for (int x = 0; x < 40; ++x) all.push_back({x, y});
+            ponderosa::StreamConfig longest;
+            longest.loadRadius = ponderosa::kMaxViewRadius;
+            longest.unloadRadius = ponderosa::kMaxViewRadius + 200;
+            const auto plan = ponderosa::planStreaming(all, {}, 10000, 10000, 500, longest);
+            size_t reach = 0;
+            for (const auto& k : all) reach += ponderosa::tileDistance(k, 10000, 10000, 500) <= ponderosa::kMaxViewRadius;
+            CHECK(reach <= static_cast<size_t>(longest.maxTiles) && plan.load.size() == reach);
+        }
         CHECK(ponderosa::stepSpeed(20, 1, 5, 800) == 25.0f);
         CHECK(std::fabs(ponderosa::stepSpeed(25, -1, 5, 800) - 20.0f) < 1e-4f);
         CHECK(ponderosa::stepSpeed(790, 1, 5, 800) == 800.0f && ponderosa::stepSpeed(5, -1, 5, 800) == 5.0f);
