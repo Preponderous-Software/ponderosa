@@ -43,8 +43,8 @@ rectangle. Only the tags the build reads are taken from the regional extract, so
 tile.
 
 WASD walks and Shift runs. The mouse or arrow keys look. **F** switches to flying: WASD follows your view at 20 m/s
-(Shift 80 m/s), E or Space climbs, Q or Ctrl descends, and F again lands you on the ground, outside any building.
-Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles. `[` `]` change the time of day and P saves a screenshot. Esc
+(Shift four times that), E or Space climbs, Q or Ctrl descends, and F again lands you on the ground, outside any building.
+Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles. The mouse wheel or Page Up and Page Down change your speed, from 5 to 800 m/s in the air. `[` `]` change the time of day and P saves a screenshot. Esc
 frees the mouse, a click takes it back, and Esc again quits.
 
 Headless:
