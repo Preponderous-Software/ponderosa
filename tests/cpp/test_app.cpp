@@ -149,6 +149,21 @@ static void testWalking() {
             CHECK(reach <= static_cast<size_t>(longest.maxTiles) && plan.load.size() == reach);
         }
         CHECK(ponderosa::stepFov(70, 1) == 75.0f && ponderosa::stepFov(110, 1) == ponderosa::kMaxFov && ponderosa::stepFov(40, -1) == ponderosa::kMinFov);
+        {
+            // Settings come back as they went in, and a bad file cannot do harm.
+            ponderosa::Settings chosen;
+            chosen.flySpeed = 152.59f;
+            chosen.viewRadius = 1200;
+            chosen.sensitivity = 0.075f;
+            chosen.fov = 95;
+            chosen.panel = false;
+            const ponderosa::Settings back = ponderosa::parseSettings(ponderosa::formatSettings(chosen));
+            CHECK(std::fabs(back.flySpeed - chosen.flySpeed) < 0.01f && back.viewRadius == 1200 && back.fov == 95 && !back.panel);
+            CHECK(std::fabs(back.sensitivity - chosen.sensitivity) < 0.001f);
+            const ponderosa::Settings bad = ponderosa::parseSettings("fly_speed 99999\nfov banana\nmystery 3\nview_radius -5\n");
+            CHECK(bad.flySpeed == ponderosa::kMaxFlySpeed && bad.fov == 70 && bad.viewRadius == ponderosa::kMinViewRadius);
+            CHECK(ponderosa::parseSettings("").flySpeed == 20);
+        }
         CHECK(std::string(ponderosa::compass(0)) == "N" && std::string(ponderosa::compass(359)) == "N");
         CHECK(std::string(ponderosa::compass(90)) == "E" && std::string(ponderosa::compass(225)) == "SW");
         const std::string panel = ponderosa::hudText({true, 40, 700, 120, 90, 58, 11});

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <sstream>
 #include <string>
 
 namespace ponderosa {
@@ -41,6 +42,44 @@ constexpr const char* kHelpText =
     "Tab        hide the panel\n"
     "H          hide this help\n"
     "Esc        free the mouse";
+
+// What is kept from one run to the next.
+struct Settings {
+    float flySpeed = 20, walkSpeed = 1.4f, viewRadius = 700, sensitivity = 0.15f, fov = 70;
+    bool panel = true;
+};
+
+// One "name value" a line. Anything unknown or unreadable keeps its default, and values are held to their ranges, so
+// a hand-edited or older file cannot leave the viewer in a bad state.
+inline Settings parseSettings(const std::string& text) {
+    Settings s;
+    std::istringstream lines(text);
+    std::string name;
+    float value;
+    while (lines >> name) {
+        if (!(lines >> value)) {
+            lines.clear();
+            lines.ignore(1000, '\n');
+            continue;
+        }
+        if (!std::isfinite(value)) continue;
+        if (name == "fly_speed") s.flySpeed = std::clamp(value, kMinFlySpeed, kMaxFlySpeed);
+        else if (name == "walk_speed") s.walkSpeed = std::clamp(value, kMinWalkSpeed, kMaxWalkSpeed);
+        else if (name == "view_radius") s.viewRadius = std::clamp(value, kMinViewRadius, kMaxViewRadius);
+        else if (name == "sensitivity") s.sensitivity = std::clamp(value, kMinSensitivity, kMaxSensitivity);
+        else if (name == "fov") s.fov = std::clamp(value, kMinFov, kMaxFov);
+        else if (name == "panel") s.panel = value != 0;
+    }
+    return s;
+}
+
+inline std::string formatSettings(const Settings& s) {
+    char text[200];
+    std::snprintf(text, sizeof text, "fly_speed %.2f\nwalk_speed %.2f\nview_radius %.0f\nsensitivity %.3f\nfov %.0f\npanel %d\n",
+                  static_cast<double>(s.flySpeed), static_cast<double>(s.walkSpeed), static_cast<double>(s.viewRadius),
+                  static_cast<double>(s.sensitivity), static_cast<double>(s.fov), s.panel ? 1 : 0);
+    return text;
+}
 
 inline float stepFov(float fov, int steps) {
     return std::clamp(fov + static_cast<float>(steps) * kFovStep, kMinFov, kMaxFov);
