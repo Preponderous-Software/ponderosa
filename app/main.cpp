@@ -446,7 +446,7 @@ int main(int argc, char** argv) {
             return false;
         if (!a.headless && !mouseHeld) {
             const std::string freed = "Click to look around. Esc again quits.";
-            if (!writeLines((static_cast<float>(w) - static_cast<float>(freed.size()) * kGlyph) / 2, 6 * kLineGap + 34, freed, yellow)) return false;
+            if (!writeLines((static_cast<float>(w) - static_cast<float>(freed.size()) * kGlyph) / 2, 7 * kLineGap + 34, freed, yellow)) return false;
         }
         if (helpOpen) {
             const float white[4] = {1, 1, 1, 1};
@@ -457,10 +457,10 @@ int main(int argc, char** argv) {
         }
         if (!hud) return true;
         const ponderosa::HudState state{flying, flying ? flySpeed : walkSpeed, stream.viewRadius(),
-                                        walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount(), stream.waiting()};
+                                        walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount(), stream.waiting(), light.time_of_day};
         const std::string text = ponderosa::hudText(state);
         const float white[4] = {1, 1, 1, 1};
-        const StrataRect panel{8, 8, 20 * kGlyph + 16, 6 * kLineGap + 10, {0, 0, 0, 0.5f}};
+        const StrataRect panel{8, 8, 20 * kGlyph + 16, 7 * kLineGap + 10, {0, 0, 0, 0.5f}};
         return check(strata_submit_rects(engine, &panel, 1), "status panel") && writeLines(16, 14, text, white);
     };
     auto draw = [&]() -> bool {

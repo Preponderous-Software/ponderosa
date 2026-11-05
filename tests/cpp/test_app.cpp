@@ -183,11 +183,13 @@ static void testWalking() {
         CHECK(ponderosa::frameStep(0.016f) == 0.016f && ponderosa::frameStep(0.2f) == 0.2f && ponderosa::frameStep(3.0f) == 0.25f);
         CHECK(std::string(ponderosa::compass(0)) == "N" && std::string(ponderosa::compass(359)) == "N");
         CHECK(std::string(ponderosa::compass(90)) == "E" && std::string(ponderosa::compass(225)) == "SW");
-        const std::string panel = ponderosa::hudText({true, 40, 700, 120, 90, 58, 11, 0});
+        const std::string panel = ponderosa::hudText({true, 40, 700, 120, 90, 58, 11, 0, 0.5f});
+        CHECK(panel.find("clock   12:00") != std::string::npos);
+        CHECK(ponderosa::hudText({true, 40, 700, 120, 90, 58, 11, 0, 0.75f}).find("clock   18:00") != std::string::npos);
         CHECK(panel.find("flying  40 m/s") != std::string::npos && panel.find("view    700 m") != std::string::npos);
         CHECK(panel.find("facing  E") != std::string::npos && panel.find("tiles   11") != std::string::npos);
-        CHECK(ponderosa::hudText({false, 1.4f, 700, 1.65f, 0, 60, 4, 0}).find("on foot  1.4 m/s") != std::string::npos);
-        CHECK(ponderosa::hudText({true, 40, 700, 120, 90, 58, 11, 3}).find("tiles   11 +3 loading") != std::string::npos);
+        CHECK(ponderosa::hudText({false, 1.4f, 700, 1.65f, 0, 60, 4, 0, 0.5f}).find("on foot  1.4 m/s") != std::string::npos);
+        CHECK(ponderosa::hudText({true, 40, 700, 120, 90, 58, 11, 3, 0.5f}).find("tiles   11 +3 loading") != std::string::npos);
         CHECK(panel.find("loading") == std::string::npos);
         CHECK(ponderosa::stepSpeed(20, 1, 5, 800) == 25.0f);
         CHECK(std::fabs(ponderosa::stepSpeed(25, -1, 5, 800) - 20.0f) < 1e-4f);
