@@ -160,10 +160,12 @@ public:
         const ponderosa::StreamPlan plan =
             ponderosa::planStreaming(m_.tiles, loaded, east(x), north(z), m_.tileSize, config_);
         for (const ponderosa::TileKey& k : plan.unload) drop(k);
+        waiting_ = static_cast<int>(plan.load.size());
         int count = 0;
         for (const ponderosa::TileKey& k : plan.load) {
             if (count++ >= maxLoads) break;
             if (!load(k)) return false;
+            --waiting_;
         }
         return true;
     }
@@ -191,6 +193,7 @@ public:
     int meshes() const { return meshCount_; }
     int peakMeshes() const { return peakMeshes_; }
     int tileCount() const { return static_cast<int>(tiles_.size()); }
+    int waiting() const { return waiting_; }
     int loads() const { return loads_; }
     int unloads() const { return unloads_; }
     double readMs() const { return readMs_; }
@@ -329,7 +332,7 @@ private:
     std::map<ponderosa::TileKey, Loaded> tiles_;
     ponderosa::Solids solids_;
     std::vector<StrataRenderItem> trees_;
-    int meshCount_ = 0, peakMeshes_ = 0, loads_ = 0, unloads_ = 0;
+    int waiting_ = 0, meshCount_ = 0, peakMeshes_ = 0, loads_ = 0, unloads_ = 0;
     double readMs_ = 0, uploadMs_ = 0, worstLoadMs_ = 0;
 };
 
@@ -454,10 +457,10 @@ int main(int argc, char** argv) {
         }
         if (!hud) return true;
         const ponderosa::HudState state{flying, flying ? flySpeed : walkSpeed, stream.viewRadius(),
-                                        walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount()};
+                                        walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount(), stream.waiting()};
         const std::string text = ponderosa::hudText(state);
         const float white[4] = {1, 1, 1, 1};
-        const StrataRect panel{8, 8, 17 * kGlyph + 16, 6 * kLineGap + 10, {0, 0, 0, 0.5f}};
+        const StrataRect panel{8, 8, 20 * kGlyph + 16, 6 * kLineGap + 10, {0, 0, 0, 0.5f}};
         return check(strata_submit_rects(engine, &panel, 1), "status panel") && writeLines(16, 14, text, white);
     };
     auto draw = [&]() -> bool {
