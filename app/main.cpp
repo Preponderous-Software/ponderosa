@@ -633,9 +633,16 @@ int main(int argc, char** argv) {
         walker.look(((held[kRight] ? 1.0f : 0.0f) - (held[kLeft] ? 1.0f : 0.0f)) * 90.0f * dt,
                     ((held[kUp] ? 1.0f : 0.0f) - (held[kDown] ? 1.0f : 0.0f)) * 60.0f * dt);
         if (!flying && held[kSpace]) walker.jump();
-        stepWalker((held[kW] ? 1.0f : 0.0f) - (held[kS] ? 1.0f : 0.0f), (held[kD] ? 1.0f : 0.0f) - (held[kA] ? 1.0f : 0.0f),
-                   held[225] || held[229], dt,
-                   (held[kE] || held[kSpace] ? 1.0f : 0.0f) - (held[kQ] || held[kLeftCtrl] ? 1.0f : 0.0f));
+        const float ahead = (held[kW] ? 1.0f : 0.0f) - (held[kS] ? 1.0f : 0.0f), right = (held[kD] ? 1.0f : 0.0f) - (held[kA] ? 1.0f : 0.0f);
+        const float rise = (held[kE] || held[kSpace] ? 1.0f : 0.0f) - (held[kQ] || held[kLeftCtrl] ? 1.0f : 0.0f);
+        stepWalker(ahead, right, held[225] || held[229], dt, rise);
+        // Say why a move stopped. Ten metres ahead is far enough to catch the edge before it feels like a freeze.
+        if (noteLeft <= 0 && (ahead != 0 || right != 0)) {
+            const float yaw = walker.yawDeg * 3.14159265f / 180.0f, fx = std::sin(yaw), fz = -std::cos(yaw);
+            const float nextX = walker.x + (ahead * fx - right * fz) * 10, nextZ = walker.z + (ahead * fz + right * fx) * 10;
+            if (flying && !stream.flyable(nextX, nextZ)) say("The map ends here");
+            else if (!flying && !stream.overTile(nextX, nextZ)) say("The streets end here. F flies on.");
+        }
         if (held[kLeftBracket]) light.time_of_day -= dt * 0.05f;
         if (held[kRightBracket]) light.time_of_day += dt * 0.05f;
         light.time_of_day -= std::floor(light.time_of_day);
