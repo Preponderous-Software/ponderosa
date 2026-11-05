@@ -43,7 +43,7 @@ struct Args {
     std::string tiles = std::string(PONDEROSA_SOURCE_DIR) + "/build/tiles", screenshot;
     bool fly = false;
     float altitude = 60;  // metres above the ground when --fly starts
-    float time = 0.45f, yaw = 0, pitch = 0, radius = 700, walkAhead = 0, east = 0, north = 0, passEast = 0, passNorth = 0;
+    float time = 0.45f, yaw = 40, pitch = 0, radius = 700, walkAhead = 0, east = 0, north = 0, passEast = 0, passNorth = 0;
     int width = 1280, height = 720, bench = 0;
     bool headless = false, run = false, hud = false;
 };
