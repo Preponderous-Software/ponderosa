@@ -57,6 +57,8 @@ Press **H** in the window to see the controls at any time.
 | `-` and `=` | Shorten or lengthen the view: 200 to 1,500 m of detailed tiles, 700 m by default |
 | `,` and `.` | Mouse sensitivity |
 | 9 and 0 | Field of view, 40 to 110 degrees |
+| I | Invert the mouse's up and down |
+| Z | Hold to zoom in on something far away |
 | Space | Jump. In the air, Space climbs. |
 | F | Fly, or land on the ground outside any building |
 | E or Space, Q or Ctrl | Climb and descend while flying |
