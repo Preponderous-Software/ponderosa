@@ -3,6 +3,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
+#include <string>
 
 namespace ponderosa {
 
@@ -19,6 +21,28 @@ inline float stepSpeed(float speed, int notches, float lowest, float highest) {
 inline float stepViewRadius(float radius, int steps) {
     const float snapped = std::round(radius / kViewRadiusStep) + static_cast<float>(steps);
     return std::clamp(snapped * kViewRadiusStep, kMinViewRadius, kMaxViewRadius);
+}
+
+// Yaw 0 faces north, 90 east.
+inline const char* compass(float yawDeg) {
+    static const char* const names[] = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
+    const float turns = yawDeg / 45.0f + 0.5f;
+    return names[static_cast<int>(std::floor(turns)) & 7];
+}
+
+struct HudState {
+    bool flying;
+    float speed, viewRadius, height, yawDeg, fps;
+    int tiles;
+};
+
+// The status panel: what mode you are in and what your settings are, one line each.
+inline std::string hudText(const HudState& s) {
+    char text[200];
+    std::snprintf(text, sizeof text, "%s  %.*f m/s\nheight  %.0f m\nview    %.0f m\nfacing  %s\ntiles   %d\n%.0f fps  H help",
+                  s.flying ? "flying" : "on foot", s.speed < 10 ? 1 : 0, static_cast<double>(s.speed), static_cast<double>(s.height),
+                  static_cast<double>(s.viewRadius), compass(s.yawDeg), s.tiles, static_cast<double>(s.fps));
+    return text;
 }
 
 }  // namespace ponderosa

@@ -34,8 +34,10 @@ namespace {
 using Clock = std::chrono::steady_clock;
 double ms(Clock::time_point from) { return std::chrono::duration<double, std::milli>(Clock::now() - from).count(); }
 
-constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, kPageUp = 75, kPageDown = 78, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
+constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, kTab = 43, kPageUp = 75, kPageDown = 78, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
               kRight = 79, kLeft = 80, kDown = 81, kUp = 82;
+
+constexpr float kGlyph = 16, kLineGap = 22;  // HUD text, in pixels
 
 struct Args {
     std::string tiles = std::string(PONDEROSA_SOURCE_DIR) + "/build/tiles", screenshot;
@@ -43,7 +45,7 @@ struct Args {
     float altitude = 60;  // metres above the ground when --fly starts
     float time = 0.45f, yaw = 0, pitch = 0, radius = 700, walkAhead = 0, east = 0, north = 0, passEast = 0, passNorth = 0;
     int width = 1280, height = 720, bench = 0;
-    bool headless = false, run = false;
+    bool headless = false, run = false, hud = false;
 };
 
 bool parse(int argc, char** argv, Args& a) {
@@ -67,6 +69,7 @@ bool parse(int argc, char** argv, Args& a) {
         else if (k == "--bench") a.bench = std::atoi(val());
         else if (k == "--headless") a.headless = true;
         else if (k == "--run") a.run = true;
+        else if (k == "--hud") a.hud = true;
         else if (k == "--screenshot") a.screenshot = val();
         else {
             std::fprintf(stderr, "unknown argument %s\n", k.c_str());
@@ -292,8 +295,8 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "ponderosa: %s\n", err.c_str());
         return 1;
     }
-    if (strata_abi_version() != STRATA_ABI_VERSION || strata_abi_minor() < 8) {
-        std::fprintf(stderr, "ponderosa: Strata %s is too old (needs ABI 1.8 for mouse look)\n", strata_version_string());
+    if (strata_abi_version() != STRATA_ABI_VERSION || strata_abi_minor() < 11) {
+        std::fprintf(stderr, "ponderosa: Strata %s is too old (needs ABI 1.11 for the status panel)\n", strata_version_string());
         return 1;
     }
     StrataEngineDesc desc{};
@@ -360,6 +363,29 @@ int main(int argc, char** argv) {
     light.fog = 1;
 
     int w = a.width, h = a.height;
+    bool flying = a.fly, hud = a.hud || !a.headless;
+    float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed, fps = 60;
+    // One StrataText a line, because a '\n' inside one leaves no gap between lines.
+    auto writeLines = [&](float x, float y, const std::string& text, const float color[4]) -> bool {
+        std::vector<std::string> lines(1);
+        for (char c : text) {
+            if (c == '\n') lines.emplace_back();
+            else lines.back() += c;
+        }
+        std::vector<StrataText> labels;
+        for (size_t i = 0; i < lines.size(); ++i)
+            labels.push_back({x, y + static_cast<float>(i) * kLineGap, kGlyph, STRATA_TEXT_SHADOW, {color[0], color[1], color[2], color[3]}, lines[i].c_str()});
+        return check(strata_submit_text(engine, labels.data(), static_cast<int32_t>(labels.size())), "text");
+    };
+    auto overlay = [&]() -> bool {
+        if (!hud) return true;
+        const ponderosa::HudState state{flying, flying ? flySpeed : walkSpeed, stream.viewRadius(),
+                                        walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount()};
+        const std::string text = ponderosa::hudText(state);
+        const float white[4] = {1, 1, 1, 1};
+        const StrataRect panel{8, 8, 17 * kGlyph + 16, 6 * kLineGap + 10, {0, 0, 0, 0.5f}};
+        return check(strata_submit_rects(engine, &panel, 1), "status panel") && writeLines(16, 14, text, white);
+    };
     auto draw = [&]() -> bool {
         float ahead[3];
         walker.forward(ahead);
@@ -377,11 +403,9 @@ int main(int argc, char** argv) {
         const auto& trees = stream.trees();
         return check(strata_set_camera(engine, &c), "camera") && check(strata_set_lighting(engine, &light), "lighting") &&
                check(strata_begin_frame(engine, &fd), "begin_frame") &&
-               check(strata_submit_primitives(engine, trees.data(), static_cast<int32_t>(trees.size())), "trees") &&
+               check(strata_submit_primitives(engine, trees.data(), static_cast<int32_t>(trees.size())), "trees") && overlay() &&
                check(strata_end_frame(engine), "end_frame");
     };
-    bool flying = a.fly;
-    float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed;
     auto walkableHere = [&](float x, float z) { return stream.walkable(x, z); };
     auto flyableHere = [&](float x, float z) { return stream.flyable(x, z); };
     auto groundHere = [&](float x, float z) { return stream.groundAt(x, z); };
@@ -477,6 +501,8 @@ int main(int argc, char** argv) {
                 if (e.scancode == kEscape) {
                     if (mouseHeld) holdMouse(false);
                     else running = false;
+                } else if (e.scancode == kTab) {
+                    hud = !hud;
                 } else if (e.scancode == kF) {
                     toggleFlight();
                 } else if (e.scancode == kP) {
@@ -503,6 +529,7 @@ int main(int argc, char** argv) {
         const auto now = Clock::now();
         const float dt = std::min(std::chrono::duration<float>(now - last).count(), 0.1f);
         last = now;
+        if (dt > 0) fps += (1.0f / dt - fps) * 0.05f;
         walker.look(((held[kRight] ? 1.0f : 0.0f) - (held[kLeft] ? 1.0f : 0.0f)) * 90.0f * dt,
                     ((held[kUp] ? 1.0f : 0.0f) - (held[kDown] ? 1.0f : 0.0f)) * 60.0f * dt);
         stepWalker((held[kW] ? 1.0f : 0.0f) - (held[kS] ? 1.0f : 0.0f), (held[kD] ? 1.0f : 0.0f) - (held[kA] ? 1.0f : 0.0f),

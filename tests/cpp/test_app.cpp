@@ -148,6 +148,12 @@ static void testWalking() {
             for (const auto& k : all) reach += ponderosa::tileDistance(k, 10000, 10000, 500) <= ponderosa::kMaxViewRadius;
             CHECK(reach <= static_cast<size_t>(longest.maxTiles) && plan.load.size() == reach);
         }
+        CHECK(std::string(ponderosa::compass(0)) == "N" && std::string(ponderosa::compass(359)) == "N");
+        CHECK(std::string(ponderosa::compass(90)) == "E" && std::string(ponderosa::compass(225)) == "SW");
+        const std::string panel = ponderosa::hudText({true, 40, 700, 120, 90, 58, 11});
+        CHECK(panel.find("flying  40 m/s") != std::string::npos && panel.find("view    700 m") != std::string::npos);
+        CHECK(panel.find("facing  E") != std::string::npos && panel.find("tiles   11") != std::string::npos);
+        CHECK(ponderosa::hudText({false, 1.4f, 700, 1.65f, 0, 60, 4}).find("on foot  1.4 m/s") != std::string::npos);
         CHECK(ponderosa::stepSpeed(20, 1, 5, 800) == 25.0f);
         CHECK(std::fabs(ponderosa::stepSpeed(25, -1, 5, 800) - 20.0f) < 1e-4f);
         CHECK(ponderosa::stepSpeed(790, 1, 5, 800) == 800.0f && ponderosa::stepSpeed(5, -1, 5, 800) == 5.0f);
