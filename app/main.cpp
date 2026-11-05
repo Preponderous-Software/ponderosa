@@ -555,8 +555,15 @@ int main(int argc, char** argv) {
     bool running = ok;
     const float startX = walker.x, startZ = walker.z;
     auto changeSpeed = [&](int notches) {
+        const float before = flying ? flySpeed : walkSpeed;
         if (flying) flySpeed = ponderosa::stepSpeed(flySpeed, notches, ponderosa::kMinFlySpeed, ponderosa::kMaxFlySpeed);
         else walkSpeed = ponderosa::stepSpeed(walkSpeed, notches, ponderosa::kMinWalkSpeed, ponderosa::kMaxWalkSpeed);
+        if ((flying ? flySpeed : walkSpeed) == before) say(notches > 0 ? "That is the top speed" : "That is the lowest speed");
+    };
+    auto changeView = [&](int steps) {
+        const float before = stream.viewRadius(), radius = ponderosa::stepViewRadius(before, steps);
+        stream.setViewRadius(radius);
+        if (radius == before) say(steps > 0 ? "That is the longest view" : "That is the shortest view");
     };
     auto holdMouse = [&](bool hold) { mouseHeld = check(strata_set_relative_mouse_mode(engine, hold ? 1 : 0), "mouse look") && hold; };
     holdMouse(true);
@@ -582,8 +589,8 @@ int main(int argc, char** argv) {
                 } else if (e.scancode == k9 || e.scancode == k0) {
                     fov = ponderosa::stepFov(fov, e.scancode == k0 ? 1 : -1);
                     say("Field of view " + std::to_string(static_cast<int>(fov)));
-                } else if (e.scancode == kMinus) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), -1));
-                else if (e.scancode == kEquals) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), 1));
+                } else if (e.scancode == kMinus) changeView(-1);
+                else if (e.scancode == kEquals) changeView(1);
                 if (e.repeat) break;
                 if (helpAtStart && (e.scancode == kW || e.scancode == kA || e.scancode == kS || e.scancode == kD || e.scancode == kF)) {
                     helpOpen = helpAtStart = false;  // it has done its job, and H brings it back
