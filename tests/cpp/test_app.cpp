@@ -148,6 +148,7 @@ static void testWalking() {
             for (const auto& k : all) reach += ponderosa::tileDistance(k, 10000, 10000, 500) <= ponderosa::kMaxViewRadius;
             CHECK(reach <= static_cast<size_t>(longest.maxTiles) && plan.load.size() == reach);
         }
+        CHECK(ponderosa::stepFov(70, 1) == 75.0f && ponderosa::stepFov(110, 1) == ponderosa::kMaxFov && ponderosa::stepFov(40, -1) == ponderosa::kMinFov);
         CHECK(std::string(ponderosa::compass(0)) == "N" && std::string(ponderosa::compass(359)) == "N");
         CHECK(std::string(ponderosa::compass(90)) == "E" && std::string(ponderosa::compass(225)) == "SW");
         const std::string panel = ponderosa::hudText({true, 40, 700, 120, 90, 58, 11});
