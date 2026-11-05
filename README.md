@@ -7,10 +7,14 @@ It covers all of Fort Collins, in 500 m tiles that load and unload as you walk o
 whole city. The repository also holds a small sample, 2 km by 2 km of Old Town, which is what the tests build. The
 same tile format is meant to carry a county and then the state.
 
-![Eye-level view along a street with buildings and sidewalks](docs/images/street.png)
+![Fort Collins from 150 m: arterial roads, shops and neighbourhoods running out to the foothills](docs/images/city.png)
 
+| | |
+|---|---|
+| ![Old Town from 60 m, with a tower and tree-lined streets](docs/images/downtown.png) | ![A tree-lined street in Old Town seen from a low flight](docs/images/street.png) |
+| ![Blocks of houses in a grid from 80 m](docs/images/neighbourhoods.png) | ![The status panel over a park and lakes, flying at 300 m](docs/images/panel.png) |
 
-*Rendered headless by the real viewer. Map data © OpenStreetMap contributors (ODbL); elevation courtesy of the USGS.*
+*Rendered by the real viewer from a citywide build, with the view at 1,500 m. Map data © OpenStreetMap contributors (ODbL); elevation courtesy of the USGS.*
 
 ## Running it
 
@@ -42,10 +46,31 @@ uv run --extra city ponderosa build --area city.json    # -> build/fort-collins/
 rectangle. Only the tags the build reads are taken from the regional extract, so names and addresses do not reach a
 tile.
 
-WASD walks and Shift runs. The mouse or arrow keys look. **F** switches to flying: WASD follows your view at 20 m/s
-(Shift four times that), E or Space climbs, Q or Ctrl descends, and F again lands you on the ground, outside any building.
-Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles. The mouse wheel or Page Up and Page Down change your speed, from 5 to 800 m/s in the air. `-` and `=` shorten or lengthen the view, 200 to 1,500 m of detailed tiles (the default is 700 m). H shows or hides this list on screen. A panel in the corner shows your mode, speed, height and view, and Tab hides it. `,` `.` change mouse sensitivity, and 9 and 0 change the field of view. Speed, view, sensitivity, field of view and the panel are remembered between runs, in `ponderosa/settings.txt` under your user configuration folder; delete it to go back to the defaults. R takes you back to where you started. `[` `]` change the time of day and P saves a screenshot. Esc
-frees the mouse, a click takes it back, and Esc again quits.
+Press **H** in the window to see the controls at any time.
+
+| Key | What it does |
+|---|---|
+| WASD | Move. On foot you stop at walls; in the air you follow your view. |
+| Mouse or arrow keys | Look |
+| Shift | Go four times faster |
+| Mouse wheel, or Page Up and Page Down | Set your speed: 5 to 800 m/s flying, 0.7 to 14 m/s on foot |
+| `-` and `=` | Shorten or lengthen the view: 200 to 1,500 m of detailed tiles, 700 m by default |
+| `,` and `.` | Mouse sensitivity |
+| 9 and 0 | Field of view, 40 to 110 degrees |
+| F | Fly, or land on the ground outside any building |
+| E or Space, Q or Ctrl | Climb and descend while flying |
+| R | Back to where you started |
+| `[` and `]` | Time of day |
+| P | Save a screenshot |
+| Tab | Hide the status panel |
+| Esc | Free the mouse. A click takes it back, and Esc again quits. |
+
+Flying stops at the edge of the overview, up to 400 m above the ground, and you can only land where there are tiles.
+A longer view costs frames, and the panel in the corner shows the frame rate as you change it.
+
+Speed, view, sensitivity, field of view and the panel are remembered between runs, in `ponderosa/settings.txt` under
+your user configuration folder. Delete that file to go back to the defaults. `ponderosa --help` lists the command-line
+options.
 
 Headless:
 
