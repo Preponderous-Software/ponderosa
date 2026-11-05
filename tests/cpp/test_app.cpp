@@ -164,6 +164,7 @@ static void testWalking() {
             CHECK(bad.flySpeed == ponderosa::kMaxFlySpeed && bad.fov == 70 && bad.viewRadius == ponderosa::kMinViewRadius);
             CHECK(ponderosa::parseSettings("").flySpeed == 20);
         }
+        CHECK(ponderosa::frameStep(0.016f) == 0.016f && ponderosa::frameStep(0.2f) == 0.2f && ponderosa::frameStep(3.0f) == 0.25f);
         CHECK(std::string(ponderosa::compass(0)) == "N" && std::string(ponderosa::compass(359)) == "N");
         CHECK(std::string(ponderosa::compass(90)) == "E" && std::string(ponderosa::compass(225)) == "SW");
         const std::string panel = ponderosa::hudText({true, 40, 700, 120, 90, 58, 11});

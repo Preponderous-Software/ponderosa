@@ -623,9 +623,9 @@ int main(int argc, char** argv) {
             }
         }
         const auto now = Clock::now();
-        const float dt = std::min(std::chrono::duration<float>(now - last).count(), 0.1f);
+        const float elapsed = std::chrono::duration<float>(now - last).count(), dt = ponderosa::frameStep(elapsed);
         last = now;
-        if (dt > 0) fps += (1.0f / dt - fps) * 0.05f;
+        if (elapsed > 0) fps += (1.0f / elapsed - fps) * std::min(1.0f, elapsed * 2);  // about half a second of smoothing
         noteLeft -= dt;
         walker.look(((held[kRight] ? 1.0f : 0.0f) - (held[kLeft] ? 1.0f : 0.0f)) * 90.0f * dt,
                     ((held[kUp] ? 1.0f : 0.0f) - (held[kDown] ? 1.0f : 0.0f)) * 60.0f * dt);
