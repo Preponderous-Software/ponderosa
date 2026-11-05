@@ -32,6 +32,7 @@ constexpr const char* kHelpText =
     "F          fly / land\n"
     "E Q        up / down\n"
     "[ ]        time of day\n"
+    "R          back to the start\n"
     "P          screenshot\n"
     "Tab        hide the panel\n"
     "H          hide this help\n"
