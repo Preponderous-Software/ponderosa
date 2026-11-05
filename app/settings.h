@@ -34,6 +34,7 @@ constexpr const char* kHelpText =
     "- =        shorter / longer view\n"
     ", .        mouse sensitivity\n"
     "9 0        field of view\n"
+    "Space      jump\n"
     "F          fly / land\n"
     "E Q        up / down\n"
     "[ ]        time of day\n"

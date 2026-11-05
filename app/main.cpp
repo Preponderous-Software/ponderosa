@@ -447,7 +447,7 @@ int main(int argc, char** argv) {
         }
         if (helpOpen) {
             const float white[4] = {1, 1, 1, 1};
-            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 15 * kLineGap + 10, {0, 0, 0, 0.5f}};
+            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 16 * kLineGap + 10, {0, 0, 0, 0.5f}};
             if (!check(strata_submit_rects(engine, &panel, 1), "help panel") ||
                 !writeLines(panel.x + 8, 14, ponderosa::kHelpText, white))
                 return false;
@@ -463,7 +463,7 @@ int main(int argc, char** argv) {
     auto draw = [&]() -> bool {
         float ahead[3];
         walker.forward(ahead);
-        const float eye[3] = {walker.x, walker.eyeY, walker.z};
+        const float eye[3] = {walker.x, walker.eyeY + walker.hop, walker.z};
         const float look[3] = {eye[0] + ahead[0], eye[1] + ahead[1], eye[2] + ahead[2]};
         const float up[3] = {0, 1, 0};
         StrataCamera c{};
@@ -490,6 +490,7 @@ int main(int argc, char** argv) {
             return;
         }
         flying = !flying;
+        walker.hop = walker.hopSpeed = 0;
         if (flying) walker.eyeY += ponderosa::kFlyClearance;  // lift off at once
         else walker.clearOfBuildings(stream.solids(), walkableHere);
     };
@@ -501,6 +502,7 @@ int main(int argc, char** argv) {
         walker.step(stream.solids(), [&](float x, float z) { return stream.walkable(x, z); }, ahead, right, run, dt, walkSpeed);
         const float target = stream.groundAt(walker.x, walker.z) + ponderosa::kEyeHeight;
         walker.eyeY += (target - walker.eyeY) * std::min(1.0f, dt * 10.0f);
+        walker.stepHop(dt);
     };
 
     if (a.headless) {
@@ -592,6 +594,7 @@ int main(int argc, char** argv) {
                     walker.yawDeg = a.yaw;
                     walker.pitchDeg = a.pitch;
                     flying = false;
+                    walker.hop = walker.hopSpeed = 0;
                     walker.eyeY = stream.groundAt(startX, startZ) + ponderosa::kEyeHeight;
                     say("Back at the start");
                 } else if (e.scancode == kH) {
@@ -629,6 +632,7 @@ int main(int argc, char** argv) {
         noteLeft -= dt;
         walker.look(((held[kRight] ? 1.0f : 0.0f) - (held[kLeft] ? 1.0f : 0.0f)) * 90.0f * dt,
                     ((held[kUp] ? 1.0f : 0.0f) - (held[kDown] ? 1.0f : 0.0f)) * 60.0f * dt);
+        if (!flying && held[kSpace]) walker.jump();
         stepWalker((held[kW] ? 1.0f : 0.0f) - (held[kS] ? 1.0f : 0.0f), (held[kD] ? 1.0f : 0.0f) - (held[kA] ? 1.0f : 0.0f),
                    held[225] || held[229], dt,
                    (held[kE] || held[kSpace] ? 1.0f : 0.0f) - (held[kQ] || held[kLeftCtrl] ? 1.0f : 0.0f));
