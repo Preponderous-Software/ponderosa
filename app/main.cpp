@@ -458,7 +458,7 @@ int main(int argc, char** argv) {
         }
         if (!hud) return true;
         const ponderosa::HudState state{flying, flying ? flySpeed : walkSpeed, stream.viewRadius(),
-                                        walker.eyeY - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount(), stream.waiting(), light.time_of_day};
+                                        walker.eyeY + walker.hop - stream.groundAt(walker.x, walker.z), walker.yawDeg, fps, stream.tileCount(), stream.waiting(), light.time_of_day};
         const std::string text = ponderosa::hudText(state);
         const float white[4] = {1, 1, 1, 1};
         const StrataRect panel{8, 8, 20 * kGlyph + 16, 7 * kLineGap + 10, {0, 0, 0, 0.5f}};
@@ -664,10 +664,11 @@ int main(int argc, char** argv) {
         if (noteLeft <= 0 && flying && rise > 0 && walker.eyeY - stream.groundAt(walker.x, walker.z) >= ponderosa::kFlyCeiling - 0.5f) {
             say("Highest you can fly: " + std::to_string(static_cast<int>(ponderosa::kFlyCeiling)) + " m above the ground");
         }
-        // Say why a move stopped. Ten metres ahead is far enough to catch the edge before it feels like a freeze.
+        // Say why a move stopped. Looks further than a frame's travel, or fast flight stops short of the edge and never sees it.
         if (noteLeft <= 0 && (ahead != 0 || right != 0)) {
             const float yaw = walker.yawDeg * 3.14159265f / 180.0f, fx = std::sin(yaw), fz = -std::cos(yaw);
-            const float nextX = walker.x + (ahead * fx - right * fz) * 10, nextZ = walker.z + (ahead * fz + right * fx) * 10;
+            const float reach = std::max(10.0f, (flying ? flySpeed : walkSpeed) * 4 * dt * 2);
+            const float nextX = walker.x + (ahead * fx - right * fz) * reach, nextZ = walker.z + (ahead * fz + right * fx) * reach;
             if (flying && !stream.flyable(nextX, nextZ)) say("The map ends here");
             else if (!flying && !stream.overTile(nextX, nextZ)) say("The streets end here. F flies on.");
         }
