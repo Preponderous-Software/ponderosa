@@ -34,7 +34,7 @@ namespace {
 using Clock = std::chrono::steady_clock;
 double ms(Clock::time_point from) { return std::chrono::duration<double, std::milli>(Clock::now() - from).count(); }
 
-constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, kTab = 43, kPageUp = 75, kPageDown = 78, kH = 11, kR = 21, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
+constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kMinus = 45, kEquals = 46, k9 = 38, k0 = 39, kComma = 54, kPeriod = 55, kTab = 43, kPageUp = 75, kPageDown = 78, kH = 11, kR = 21, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
               kRight = 79, kLeft = 80, kDown = 81, kUp = 82;
 
 constexpr float kGlyph = 16, kLineGap = 22;  // HUD text, in pixels
@@ -364,7 +364,7 @@ int main(int argc, char** argv) {
 
     int w = a.width, h = a.height;
     bool flying = a.fly, hud = a.hud || !a.headless;
-    float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed, fps = 60;
+    float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed, sensitivity = 0.15f, fov = 70, fps = 60;
     bool helpOpen = !a.headless, helpAtStart = helpOpen, mouseHeld = false;
     std::string note;  // a passing message: what just happened, or why it did not
     float noteLeft = 0;
@@ -395,7 +395,7 @@ int main(int argc, char** argv) {
         }
         if (helpOpen) {
             const float white[4] = {1, 1, 1, 1};
-            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 13 * kLineGap + 10, {0, 0, 0, 0.5f}};
+            const StrataRect panel{static_cast<float>(w) - 33 * kGlyph - 24, 8, 33 * kGlyph + 16, 15 * kLineGap + 10, {0, 0, 0, 0.5f}};
             if (!check(strata_submit_rects(engine, &panel, 1), "help panel") ||
                 !writeLines(panel.x + 8, 14, ponderosa::kHelpText, white))
                 return false;
@@ -419,7 +419,7 @@ int main(int argc, char** argv) {
         const float aboveGround = walker.eyeY - stream.groundAt(walker.x, walker.z);
         ponderosa::clipPlanes(aboveGround, nearPlane, farPlane);
         light.shadow_distance = std::max(300.0f, aboveGround * 3.0f);
-        strata_camera_look_at(eye, look, up, 70.0f, static_cast<float>(w) / static_cast<float>(std::max(1, h)), nearPlane, farPlane, &c);
+        strata_camera_look_at(eye, look, up, fov, static_cast<float>(w) / static_cast<float>(std::max(1, h)), nearPlane, farPlane, &c);
         StrataFrameDesc fd{};
         fd.clear_flags = STRATA_CLEAR_COLOR | STRATA_CLEAR_DEPTH | STRATA_CLEAR_SKY;
         const auto& trees = stream.trees();
@@ -517,7 +517,15 @@ int main(int argc, char** argv) {
                 if (e.scancode >= 0 && e.scancode < 256) held[e.scancode] = true;
                 if (e.scancode == kPageUp) changeSpeed(1);
                 else if (e.scancode == kPageDown) changeSpeed(-1);
-                else if (e.scancode == kMinus) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), -1));
+                else if (e.scancode == kComma || e.scancode == kPeriod) {
+                    sensitivity = ponderosa::stepSpeed(sensitivity, e.scancode == kPeriod ? 1 : -1, ponderosa::kMinSensitivity, ponderosa::kMaxSensitivity);
+                    char text[40];
+                    std::snprintf(text, sizeof text, "Mouse sensitivity %.2f", static_cast<double>(sensitivity));
+                    say(text);
+                } else if (e.scancode == k9 || e.scancode == k0) {
+                    fov = ponderosa::stepFov(fov, e.scancode == k0 ? 1 : -1);
+                    say("Field of view " + std::to_string(static_cast<int>(fov)));
+                } else if (e.scancode == kMinus) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), -1));
                 else if (e.scancode == kEquals) stream.setViewRadius(ponderosa::stepViewRadius(stream.viewRadius(), 1));
                 if (e.repeat) break;
                 if (helpAtStart && (e.scancode == kW || e.scancode == kA || e.scancode == kS || e.scancode == kD || e.scancode == kF)) {
@@ -557,7 +565,7 @@ int main(int argc, char** argv) {
                 if (e.y != 0) changeSpeed(e.y > 0 ? 1 : -1);
                 break;
             case STRATA_EVENT_MOUSE_MOTION:
-                if (mouseHeld) walker.look(e.dx * 0.15f, -e.dy * 0.15f);
+                if (mouseHeld) walker.look(e.dx * sensitivity, -e.dy * sensitivity);
                 break;
             default: break;
             }

@@ -10,6 +10,8 @@ namespace ponderosa {
 
 constexpr float kMinFlySpeed = 5.0f, kMaxFlySpeed = 800.0f;    // metres a second
 constexpr float kMinWalkSpeed = 0.7f, kMaxWalkSpeed = 14.0f;
+constexpr float kMinSensitivity = 0.03f, kMaxSensitivity = 0.6f;   // degrees a pixel of mouse movement
+constexpr float kMinFov = 40.0f, kMaxFov = 110.0f, kFovStep = 5.0f;  // vertical, in degrees
 constexpr float kSpeedNotch = 1.25f;                           // one wheel notch
 constexpr float kMinViewRadius = 200.0f, kMaxViewRadius = 1500.0f, kViewRadiusStep = 100.0f;  // 1500 m fits the tile budget
 
@@ -29,6 +31,8 @@ constexpr const char* kHelpText =
     "Shift      go four times faster\n"
     "wheel      slower / faster\n"
     "- =        shorter / longer view\n"
+    ", .        mouse sensitivity\n"
+    "9 0        field of view\n"
     "F          fly / land\n"
     "E Q        up / down\n"
     "[ ]        time of day\n"
@@ -37,6 +41,10 @@ constexpr const char* kHelpText =
     "Tab        hide the panel\n"
     "H          hide this help\n"
     "Esc        free the mouse";
+
+inline float stepFov(float fov, int steps) {
+    return std::clamp(fov + static_cast<float>(steps) * kFovStep, kMinFov, kMaxFov);
+}
 
 // Yaw 0 faces north, 90 east.
 inline const char* compass(float yawDeg) {
