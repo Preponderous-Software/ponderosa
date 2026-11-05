@@ -443,7 +443,7 @@ int main(int argc, char** argv) {
             return false;
         if (!a.headless && !mouseHeld) {
             const std::string freed = "Click to look around. Esc again quits.";
-            if (!writeLines((static_cast<float>(w) - static_cast<float>(freed.size()) * kGlyph) / 2, 40, freed, yellow)) return false;
+            if (!writeLines((static_cast<float>(w) - static_cast<float>(freed.size()) * kGlyph) / 2, 6 * kLineGap + 34, freed, yellow)) return false;
         }
         if (helpOpen) {
             const float white[4] = {1, 1, 1, 1};
