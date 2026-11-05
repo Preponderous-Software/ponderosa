@@ -19,6 +19,7 @@
 #include <string>
 #include <vector>
 
+#include "settings.h"
 #include "streaming.h"
 #include "strata/strata.h"
 #include "tile.h"
@@ -33,7 +34,7 @@ namespace {
 using Clock = std::chrono::steady_clock;
 double ms(Clock::time_point from) { return std::chrono::duration<double, std::milli>(Clock::now() - from).count(); }
 
-constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
+constexpr int kA = 4, kD = 7, kE = 8, kF = 9, kP = 19, kQ = 20, kSpace = 44, kLeftCtrl = 224, kPageUp = 75, kPageDown = 78, kS = 22, kW = 26, kEscape = 41, kLeftBracket = 47, kRightBracket = 48,
               kRight = 79, kLeft = 80, kDown = 81, kUp = 82;
 
 struct Args {
@@ -375,6 +376,7 @@ int main(int argc, char** argv) {
                check(strata_end_frame(engine), "end_frame");
     };
     bool flying = a.fly;
+    float flySpeed = ponderosa::kFlySpeed, walkSpeed = ponderosa::kWalkSpeed;
     auto walkableHere = [&](float x, float z) { return stream.walkable(x, z); };
     auto flyableHere = [&](float x, float z) { return stream.flyable(x, z); };
     auto groundHere = [&](float x, float z) { return stream.groundAt(x, z); };
@@ -391,10 +393,10 @@ int main(int argc, char** argv) {
     };
     auto stepWalker = [&](float ahead, float right, bool run, float dt, float up = 0) {
         if (flying) {
-            walker.fly(flyableHere, groundHere, ahead, right, up, run, dt);
+            walker.fly(flyableHere, groundHere, ahead, right, up, run, dt, flySpeed);
             return;
         }
-        walker.step(stream.solids(), [&](float x, float z) { return stream.walkable(x, z); }, ahead, right, run, dt);
+        walker.step(stream.solids(), [&](float x, float z) { return stream.walkable(x, z); }, ahead, right, run, dt, walkSpeed);
         const float target = stream.groundAt(walker.x, walker.z) + ponderosa::kEyeHeight;
         walker.eyeY += (target - walker.eyeY) * std::min(1.0f, dt * 10.0f);
     };
@@ -444,6 +446,10 @@ int main(int argc, char** argv) {
 
     std::puts("WASD walk, Shift run, F fly (E up, Q down), mouse or arrows look, [ ] time, P screenshot, Esc frees the mouse, Esc again quits");
     bool running = ok, mouseHeld = false;
+    auto changeSpeed = [&](int notches) {
+        if (flying) flySpeed = ponderosa::stepSpeed(flySpeed, notches, ponderosa::kMinFlySpeed, ponderosa::kMaxFlySpeed);
+        else walkSpeed = ponderosa::stepSpeed(walkSpeed, notches, ponderosa::kMinWalkSpeed, ponderosa::kMaxWalkSpeed);
+    };
     auto holdMouse = [&](bool hold) { mouseHeld = check(strata_set_relative_mouse_mode(engine, hold ? 1 : 0), "mouse look") && hold; };
     holdMouse(true);
     bool held[256] = {};
@@ -458,6 +464,8 @@ int main(int argc, char** argv) {
             case STRATA_EVENT_RESIZED: strata_get_drawable_size(engine, &w, &h); break;
             case STRATA_EVENT_KEY_DOWN:
                 if (e.scancode >= 0 && e.scancode < 256) held[e.scancode] = true;
+                if (e.scancode == kPageUp) changeSpeed(1);
+                else if (e.scancode == kPageDown) changeSpeed(-1);
                 if (e.repeat) break;
                 if (e.scancode == kEscape) {
                     if (mouseHeld) holdMouse(false);
@@ -475,6 +483,9 @@ int main(int argc, char** argv) {
                 break;
             case STRATA_EVENT_MOUSE_BUTTON_DOWN:
                 if (!mouseHeld) holdMouse(true);
+                break;
+            case STRATA_EVENT_MOUSE_WHEEL:
+                if (e.y != 0) changeSpeed(e.y > 0 ? 1 : -1);
                 break;
             case STRATA_EVENT_MOUSE_MOTION:
                 if (mouseHeld) walker.look(e.dx * 0.15f, -e.dy * 0.15f);

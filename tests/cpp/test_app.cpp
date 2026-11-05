@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <string>
 
+#include "settings.h"
 #include "streaming.h"
 #include "tile.h"
 #include "walker.h"
@@ -123,6 +124,17 @@ static void testWalking() {
         f.yawDeg = 135;  // and it can be slid along
         f.fly(mapped, ground, 1, 0, 0, false, 1.0f);
         CHECK(f.z > z0 && f.x < 1000);
+
+        ponderosa::Walker quick;  // A chosen speed, and Shift scaling it.
+        quick.x = 100;
+        quick.yawDeg = 90;
+        quick.fly(mapped, ground, 1, 0, 0, false, 1.0f, 200.0f);
+        CHECK(std::fabs(quick.x - 300) < 1e-2f);
+        quick.fly(mapped, ground, 1, 0, 0, true, 1.0f, 100.0f);
+        CHECK(std::fabs(quick.x - 700) < 1e-2f);
+        CHECK(ponderosa::stepSpeed(20, 1, 5, 800) == 25.0f);
+        CHECK(std::fabs(ponderosa::stepSpeed(25, -1, 5, 800) - 20.0f) < 1e-4f);
+        CHECK(ponderosa::stepSpeed(790, 1, 5, 800) == 800.0f && ponderosa::stepSpeed(5, -1, 5, 800) == 5.0f);
 
         ponderosa::Walker land;  // Landing on a roof steps off it.
         land.x = 110;

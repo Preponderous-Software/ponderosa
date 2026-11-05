@@ -105,10 +105,10 @@ struct Walker {
     }
     // Moves by ahead/right (-1..1), sliding along solids and stopping where `walkable(x, z)` says no.
     template <typename Walkable>
-    void step(const Solids& solids, Walkable&& walkable, float ahead, float right, bool run, float dt) {
+    void step(const Solids& solids, Walkable&& walkable, float ahead, float right, bool run, float dt, float speed = kWalkSpeed) {
         const float length = std::hypot(ahead, right);
         if (length <= 0) return;
-        const float yaw = yawDeg * 3.14159265f / 180.0f, scale = (run ? kRunSpeed : kWalkSpeed) * dt / std::max(1.0f, length);
+        const float yaw = yawDeg * 3.14159265f / 180.0f, scale = (run ? speed * kRunSpeed / kWalkSpeed : speed) * dt / std::max(1.0f, length);
         const float fx = std::sin(yaw), fz = -std::cos(yaw);
         const float dx = (ahead * fx - right * fz) * scale, dz = (ahead * fz + right * fx) * scale;
         const int steps = std::max(1, static_cast<int>(std::ceil(std::hypot(dx, dz) / (kBodyRadius * 0.5f))));
@@ -124,12 +124,12 @@ struct Walker {
     // Moves freely toward the view: ahead and right follow the look, up follows the world. Solids do not
     // stop a flight, but `walkable(x, z)` does, one axis at a time so the edge of the map can be slid along.
     template <typename Walkable, typename Ground>
-    void fly(Walkable&& walkable, Ground&& ground, float ahead, float right, float up, bool fast, float dt) {
+    void fly(Walkable&& walkable, Ground&& ground, float ahead, float right, float up, bool fast, float dt, float speed = kFlySpeed) {
         const float length = std::sqrt(ahead * ahead + right * right + up * up);
         if (length > 0) {
             float f[3];
             forward(f);
-            const float yaw = yawDeg * 3.14159265f / 180.0f, scale = (fast ? kFlyFastSpeed : kFlySpeed) * dt / std::max(1.0f, length);
+            const float yaw = yawDeg * 3.14159265f / 180.0f, scale = (fast ? speed * kFlyFastSpeed / kFlySpeed : speed) * dt / std::max(1.0f, length);
             const float dx = (ahead * f[0] + right * std::cos(yaw)) * scale, dz = (ahead * f[2] + right * std::sin(yaw)) * scale;
             if (walkable(x + dx, z)) x += dx;
             if (walkable(x, z + dz)) z += dz;
