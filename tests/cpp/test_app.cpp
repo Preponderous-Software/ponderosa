@@ -173,9 +173,10 @@ static void testWalking() {
             chosen.sensitivity = 0.075f;
             chosen.fov = 95;
             chosen.panel = false;
+            chosen.invertLook = true;
             const ponderosa::Settings back = ponderosa::parseSettings(ponderosa::formatSettings(chosen));
             CHECK(std::fabs(back.flySpeed - chosen.flySpeed) < 0.01f && back.viewRadius == 1200 && back.fov == 95 && !back.panel);
-            CHECK(std::fabs(back.sensitivity - chosen.sensitivity) < 0.001f);
+            CHECK(std::fabs(back.sensitivity - chosen.sensitivity) < 0.001f && back.invertLook);
             const ponderosa::Settings bad = ponderosa::parseSettings("fly_speed 99999\nfov banana\nmystery 3\nview_radius -5\n");
             CHECK(bad.flySpeed == ponderosa::kMaxFlySpeed && bad.fov == 70 && bad.viewRadius == ponderosa::kMinViewRadius);
             CHECK(ponderosa::parseSettings("").flySpeed == 20);

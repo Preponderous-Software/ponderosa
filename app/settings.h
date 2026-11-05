@@ -41,13 +41,14 @@ constexpr const char* kHelpText =
     "R          back to the start\n"
     "P          screenshot\n"
     "Tab        hide the panel\n"
+    "Backspace  default settings\n"
     "H          hide this help\n"
     "Esc        free the mouse";
 
 // What is kept from one run to the next.
 struct Settings {
     float flySpeed = 20, walkSpeed = 1.4f, viewRadius = 700, sensitivity = 0.15f, fov = 70;
-    bool panel = true;
+    bool panel = true, invertLook = false;
 };
 
 // One "name value" a line. Anything unknown or unreadable keeps its default, and values are held to their ranges, so
@@ -70,15 +71,16 @@ inline Settings parseSettings(const std::string& text) {
         else if (name == "sensitivity") s.sensitivity = std::clamp(value, kMinSensitivity, kMaxSensitivity);
         else if (name == "fov") s.fov = std::clamp(value, kMinFov, kMaxFov);
         else if (name == "panel") s.panel = value != 0;
+        else if (name == "invert_look") s.invertLook = value != 0;
     }
     return s;
 }
 
 inline std::string formatSettings(const Settings& s) {
     char text[200];
-    std::snprintf(text, sizeof text, "fly_speed %.2f\nwalk_speed %.2f\nview_radius %.0f\nsensitivity %.3f\nfov %.0f\npanel %d\n",
+    std::snprintf(text, sizeof text, "fly_speed %.2f\nwalk_speed %.2f\nview_radius %.0f\nsensitivity %.3f\nfov %.0f\npanel %d\ninvert_look %d\n",
                   static_cast<double>(s.flySpeed), static_cast<double>(s.walkSpeed), static_cast<double>(s.viewRadius),
-                  static_cast<double>(s.sensitivity), static_cast<double>(s.fov), s.panel ? 1 : 0);
+                  static_cast<double>(s.sensitivity), static_cast<double>(s.fov), s.panel ? 1 : 0, s.invertLook ? 1 : 0);
     return text;
 }
 
