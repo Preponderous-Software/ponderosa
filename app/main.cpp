@@ -636,6 +636,9 @@ int main(int argc, char** argv) {
         const float ahead = (held[kW] ? 1.0f : 0.0f) - (held[kS] ? 1.0f : 0.0f), right = (held[kD] ? 1.0f : 0.0f) - (held[kA] ? 1.0f : 0.0f);
         const float rise = (held[kE] || held[kSpace] ? 1.0f : 0.0f) - (held[kQ] || held[kLeftCtrl] ? 1.0f : 0.0f);
         stepWalker(ahead, right, held[225] || held[229], dt, rise);
+        if (noteLeft <= 0 && flying && rise > 0 && walker.eyeY - stream.groundAt(walker.x, walker.z) >= ponderosa::kFlyCeiling - 0.5f) {
+            say("Highest you can fly: " + std::to_string(static_cast<int>(ponderosa::kFlyCeiling)) + " m above the ground");
+        }
         // Say why a move stopped. Ten metres ahead is far enough to catch the edge before it feels like a freeze.
         if (noteLeft <= 0 && (ahead != 0 || right != 0)) {
             const float yaw = walker.yawDeg * 3.14159265f / 180.0f, fx = std::sin(yaw), fz = -std::cos(yaw);
