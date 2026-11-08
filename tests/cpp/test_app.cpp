@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <string>
 
+#include "ponderosa.h"
 #include "settings.h"
 #include "streaming.h"
 #include "tile.h"

@@ -1,1 +1,2 @@
-"""Open map and elevation data as streamed 3D tiles."""
+"""Ponderosa builds its maps with streetkit (https://github.com/Preponderous-Software/streetkit). `ponderosa` is
+streetkit's command, run from this folder."""
