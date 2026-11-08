@@ -3,13 +3,13 @@ name = "ponderosa"
 version = "0.1.0"
 description = "Open map and elevation data as streamed 3D tiles, rendered with Strata"
 requires-python = ">=3.12,<3.13"
-dependencies = ["numpy>=1.26", "pyproj>=3.6", "tifffile>=2024.1.30", "mapbox-earcut>=1.0"]
+dependencies = ["streetkit @ git+https://github.com/Preponderous-Software/streetkit@b461d50c836da22f9c551cd29c7f220530c07567"]
 
 [project.optional-dependencies]
-city = ["osmium>=4"]
+city = ["streetkit[city] @ git+https://github.com/Preponderous-Software/streetkit@b461d50c836da22f9c551cd29c7f220530c07567"]
 
 [project.scripts]
-ponderosa = "ponderosa.cli:main"
+ponderosa = "streetkit.cli:main"
 
 [dependency-groups]
 dev = ["pytest>=8", "pillow>=10"]
@@ -17,6 +17,9 @@ dev = ["pytest>=8", "pillow>=10"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true   # streetkit is pinned to a commit on GitHub, like Strata in strata.ref
 
 [tool.hatch.build.targets.wheel]
 packages = ["ponderosa"]

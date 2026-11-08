@@ -22,14 +22,23 @@ FetchContent_Declare(strata
   GIT_TAG ${_strata_ref})
 FetchContent_MakeAvailable(strata)
 
-add_library(ponderosa_tiles STATIC app/tile.cpp)
-target_include_directories(ponderosa_tiles PUBLIC app)
+# streetkit, the map library Ponderosa is built on, pinned like Strata (see streetkit.ref).
+file(READ "${CMAKE_CURRENT_SOURCE_DIR}/streetkit.ref" _streetkit_ref)
+string(STRIP "${_streetkit_ref}" _streetkit_ref)
+set(STREETKIT_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(streetkit
+  GIT_REPOSITORY https://github.com/Preponderous-Software/streetkit.git
+  GIT_TAG ${_streetkit_ref})
+FetchContent_MakeAvailable(streetkit)
+
+add_library(ponderosa_tiles INTERFACE)
+target_include_directories(ponderosa_tiles INTERFACE app)
+target_link_libraries(ponderosa_tiles INTERFACE streetkit::streetkit)
 
 add_executable(ponderosa app/main.cpp)
 target_link_libraries(ponderosa PRIVATE ponderosa_tiles strata::static)
 target_compile_definitions(ponderosa PRIVATE PONDEROSA_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 if(NOT MSVC)
-  target_compile_options(ponderosa_tiles PRIVATE -Wall -Wextra)
   target_compile_options(ponderosa PRIVATE -Wall -Wextra)
 endif()
 

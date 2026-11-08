@@ -18,6 +18,11 @@ same tile format is meant to carry a county and then the state.
 
 ## Running it
 
+The map pipeline and the C++ that loads, streams and walks the tiles are
+[streetkit](https://github.com/Preponderous-Software/streetkit), which grew out of this project and Old Town Walk.
+It is pinned to a commit in `streetkit.ref` and `pyproject.toml`, and `ponderosa` is its command, run from this folder.
+This repository holds the areas, the pinned city sources and the viewer.
+
 Needs Python 3.12 via [uv](https://docs.astral.sh/uv/), CMake ≥ 3.24, a C++17 compiler and OpenGL 4.5.
 
 The Old Town sample builds offline from what is committed:
@@ -101,7 +106,7 @@ LIBGL_ALWAYS_SOFTWARE=1 GALLIUM_DRIVER=llvmpipe ./build/app/ponderosa --headless
   of each sample is roof or road. Every sample sits a metre below the lowest detailed ground in reach, so the loaded
   tiles always cover it, and the camera's near plane lifts with height to keep the two apart at a distance.
 
-The layout is documented at the top of `ponderosa/tiles.py`. `manifest.txt` lists every tile with its size and hash.
+The layout is documented at the top of `streetkit/tiles.py` in [streetkit](https://github.com/Preponderous-Software/streetkit). `manifest.txt` lists every tile with its size and hash.
 
 ## Measurements
 
