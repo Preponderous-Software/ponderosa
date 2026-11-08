@@ -196,8 +196,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "streetkit", git = "https://github.com/Preponderous-Software/streetkit?rev=b92808407b870ccaa2d2f9568c77bf07e0bea182" },
-    { name = "streetkit", extras = ["city"], marker = "extra == 'city'", git = "https://github.com/Preponderous-Software/streetkit?rev=b92808407b870ccaa2d2f9568c77bf07e0bea182" },
+    { name = "streetkit", git = "https://github.com/Preponderous-Software/streetkit?rev=b461d50c836da22f9c551cd29c7f220530c07567" },
+    { name = "streetkit", extras = ["city"], marker = "extra == 'city'", git = "https://github.com/Preponderous-Software/streetkit?rev=b461d50c836da22f9c551cd29c7f220530c07567" },
 ]
 provides-extras = ["city"]
 
@@ -270,7 +270,7 @@ wheels = [
 [[package]]
 name = "streetkit"
 version = "0.1.0"
-source = { git = "https://github.com/Preponderous-Software/streetkit?rev=b92808407b870ccaa2d2f9568c77bf07e0bea182#b92808407b870ccaa2d2f9568c77bf07e0bea182" }
+source = { git = "https://github.com/Preponderous-Software/streetkit?rev=b461d50c836da22f9c551cd29c7f220530c07567#b461d50c836da22f9c551cd29c7f220530c07567" }
 dependencies = [
     { name = "mapbox-earcut" },
     { name = "numpy" },

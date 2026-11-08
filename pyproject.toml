@@ -3,10 +3,10 @@ name = "ponderosa"
 version = "0.1.0"
 description = "Open map and elevation data as streamed 3D tiles, rendered with Strata"
 requires-python = ">=3.12,<3.13"
-dependencies = ["streetkit @ git+https://github.com/Preponderous-Software/streetkit@b92808407b870ccaa2d2f9568c77bf07e0bea182"]
+dependencies = ["streetkit @ git+https://github.com/Preponderous-Software/streetkit@b461d50c836da22f9c551cd29c7f220530c07567"]
 
 [project.optional-dependencies]
-city = ["streetkit[city] @ git+https://github.com/Preponderous-Software/streetkit@b92808407b870ccaa2d2f9568c77bf07e0bea182"]
+city = ["streetkit[city] @ git+https://github.com/Preponderous-Software/streetkit@b461d50c836da22f9c551cd29c7f220530c07567"]
 
 [project.scripts]
 ponderosa = "streetkit.cli:main"
